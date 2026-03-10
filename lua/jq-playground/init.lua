@@ -14,4 +14,12 @@ function M.setup(opts)
   })
 end
 
+function M.run_query()
+  require("jq-playground.playground").run_query()
+end
+
+function M.get_bufs()
+  return require("jq-playground.playground").get_bufs()
+end
+
 return M

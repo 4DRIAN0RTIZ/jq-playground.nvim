@@ -2,6 +2,8 @@ local M = {}
 local ns = vim.api.nvim_create_namespace("jq-playground")
 local augroup = vim.api.nvim_create_augroup("jq-playground", {})
 
+local active = nil
+
 local function show_error(msg)
   vim.notify("jq-playground: " .. msg, vim.log.levels.ERROR, {})
 end
@@ -144,6 +146,8 @@ function M.init_playground(filename)
   end)
   virt_text_hint(query_buf, "Run your query with <CR>.")
 
+  active = { cmd = cfg.cmd, input = filename or curbuf, query_buf = query_buf, output_buf = output_buf }
+
   vim.keymap.set({ "n", "i" }, "<Plug>(JqPlaygroundRunQuery)", function()
     run_query(cfg.cmd, filename or curbuf, query_buf, output_buf)
   end, {
@@ -158,6 +162,18 @@ function M.init_playground(filename)
       desc = "Default for JqPlaygroundRunQuery",
     })
   end
+end
+
+function M.run_query()
+  if not active then
+    show_error("no active playground")
+    return
+  end
+  run_query(active.cmd, active.input, active.query_buf, active.output_buf)
+end
+
+function M.get_bufs()
+  return active
 end
 
 return M
